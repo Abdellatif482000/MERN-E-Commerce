@@ -39,11 +39,11 @@ mongoose.connection.on("connected", () => {
     "\n",
     "------------",
     "\n",
-    "DBURI: (" + MONGO_URI + ")",
+    "DB-URI: ( " + MONGO_URI + " )",
     "\n",
     "------------",
     "\n",
-    "DBName: (" + DB_NAME + ")",
+    "DB-Name: ( " + DB_NAME + " )",
     "\n",
     "________________________"
   );

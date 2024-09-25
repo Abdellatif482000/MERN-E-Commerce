@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import mongooseHidden from "mongoose-hidden";
 
 import UserModel from "../models/authModel.js";
 
@@ -17,37 +18,53 @@ mongoose.connect(MONGO_URI, {
   useUnifiedTopology: true,
 });
 
-const saltRounds = 10;
-
 export const signup = async (req, res) => {
-  try {
-    // const { username, password, email, phoneNum, role } = req.body;
-    const hashedPass = await bcrypt.hash(req.body.password, saltRounds);
-    const newUser = new UserModel({
-      username: req.body.username,
-      email: req.body.email,
-      phoneNum: req.body.phoneNum,
-      password: hashedPass,
-      role: req.body.role,
+  const newUser = new UserModel(req.body);
+
+  await newUser
+    .validate()
+    .then(async () => {
+      console.log(
+        "requested data: ",
+        req.body,
+        "\n",
+        "-------------",
+        "\n",
+        "-------------",
+        "\n",
+        "new instance of the UserModel: ",
+        "\n",
+        newUser,
+        "\n",
+        "Data is valid"
+      );
+
+      await newUser.save().then((user) => {
+        console.log(
+          "-------------",
+          "\n",
+          "data in DB:",
+          "\n",
+          user,
+          "\n",
+          "-------------"
+        );
+        res.status(200).json({ massege: "inserted", data: user });
+      });
+    })
+    .catch((err) => {
+      res.status(400).json({ massege: "Not Valid", error: err });
+
+      console.error("----- not valid ------", "\n", err, "\n", "-----------");
     });
+  // try {
+  //   // ----- check valid -----
 
-    UserModel.create({
-      username: req.body.username,
-      email: req.body.email,
-      phoneNum: req.body.phoneNum,
-      password: hashedPass,
-      role: req.body.role,
-    });
+  //   // ----- save -----
 
-    // await newUser.save();
-
-    console.log(newUser);
-
-    res.status(200).json({ massege: "inserted", data: newUser });
-  } catch (err) {
-    res.status(400).send(err);
-    console.log(err);
-  }
+  // } catch (err) {
+  //   console.log("not valid", err);
+  // }
 };
 
 export const signin = async (req, res) => {
@@ -59,13 +76,21 @@ export const signin = async (req, res) => {
         bcrypt
           .compare(password, user.password)
           .then((isMatch) => {
-            console.log("Is pass Match? " + isMatch);
+            console.log("Is pass match? " + isMatch);
             if (isMatch) {
-              const token = jwt.sign({ ID: req.body.ID }, JWT_SECRET, {
-                expiresIn: "1h",
-              });
-              res.status(200).send({ token, user });
+              const token = jwt.sign(
+                { username: user.username, email: user.email },
+                JWT_SECRET,
+                {
+                  expiresIn: "1h",
+                }
+              );
+
               console.log("userData: " + user);
+              console.log("Full Name with virtuals: " + user.fullName);
+              res.status(200).send({ token, user });
+
+              console.log("--------------");
             } else {
               res.status(401).json({ massage: "Invalid pass" });
             }
