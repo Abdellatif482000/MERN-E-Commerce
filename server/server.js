@@ -6,12 +6,16 @@ import mongoose from "mongoose";
 
 // Routes
 import authRoutes from "./routes/authRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
 
 const app = exp();
 app.use(cors());
 app.use(exp.json());
 
 app.use("/", authRoutes);
+app.use("/", productRoutes);
+app.use("/", cartRoutes);
 
 dotenv.config();
 const PORT = process.env.PORT || 3030;

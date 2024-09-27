@@ -1,8 +1,17 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import generateUniqueId from "generate-unique-id";
+
+const uniqueId = generateUniqueId({
+  length: 10, // Length of the ID
+  uppercase: true, // Use uppercase letters
+  numbers: true, // Include numbers
+  symbols: false, // Do not include symbols
+});
 
 const userSchema = new mongoose.Schema(
   {
+    userID: { type: mongoose.Types.ObjectId, default: uniqueId },
     email: {
       type: String,
       require: true,

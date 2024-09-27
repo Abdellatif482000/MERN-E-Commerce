@@ -2,9 +2,9 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import mongooseHidden from "mongoose-hidden";
 
 import UserModel from "../models/authModel.js";
+import CartModel from "../models/cartModels.js";
 
 dotenv.config();
 
@@ -30,9 +30,7 @@ export const signup = async (req, res) => {
         "\n",
         "-------------",
         "\n",
-        "-------------",
-        "\n",
-        "new instance of the UserModel: ",
+        "new instance of the UserModel before save in DB: ",
         "\n",
         newUser,
         "\n",
@@ -49,6 +47,14 @@ export const signup = async (req, res) => {
           "\n",
           "-------------"
         );
+
+        const newCart = new CartModel({
+          cartID: newUser.userID,
+          items: [],
+        });
+
+        newCart.save();
+
         res.status(200).json({ massege: "inserted", data: user });
       });
     })
@@ -57,14 +63,6 @@ export const signup = async (req, res) => {
 
       console.error("----- not valid ------", "\n", err, "\n", "-----------");
     });
-  // try {
-  //   // ----- check valid -----
-
-  //   // ----- save -----
-
-  // } catch (err) {
-  //   console.log("not valid", err);
-  // }
 };
 
 export const signin = async (req, res) => {
@@ -88,7 +86,7 @@ export const signin = async (req, res) => {
 
               console.log("userData: " + user);
               console.log("Full Name with virtuals: " + user.fullName);
-              res.status(200).send({ token, user });
+              res.status(302).send({ token, user });
 
               console.log("--------------");
             } else {
