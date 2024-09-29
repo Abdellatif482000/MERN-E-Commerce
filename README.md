@@ -1,3 +1,3 @@
 #MERN E-Commerce
 
-ReactJS - NodeJS - ExpressJS - MongoDB - Mongoose - TailwindCSS
+ReactJS - NodeJS - ExpressJS - MongoDB - Mongoose - TailwindCSS - Typescript
